@@ -11,6 +11,15 @@ const TellMe = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedAge, setSelectedAge] = useState<string | null>(null);
 
+  const handleFinish = () => {
+    if (shopFor && selectedAge) {
+      console.log("Shop for:", shopFor);
+      console.log("Age range:", selectedAge);
+      // Add your navigation or submission logic here
+    }
+    router.push("/home/home");
+  };
+
   return (
     <View className="flex-1 bg-white px-6 pb-10 ">
       {/* Header with back button */}
@@ -115,13 +124,7 @@ const TellMe = () => {
         className={`py-4 rounded-full items-center  ${
           shopFor && selectedAge ? "bg-purple-600" : "bg-purple-300"
         }`}
-        onPress={() => {
-          if (shopFor && selectedAge) {
-            console.log("Shop for:", shopFor);
-            console.log("Age range:", selectedAge);
-            // Add your navigation or submission logic here
-          }
-        }}
+        onPress={handleFinish}
         disabled={!shopFor || !selectedAge}
       >
         <Text className="text-white font-medium text-lg text-lg font-clashBold text-xl">
