@@ -1,11 +1,14 @@
-import { View, Text } from "react-native";
+import { View, Text, SafeAreaView } from "react-native";
 import React from "react";
+import Navbar from "@/components/home/Navbar";
+import Hero from "@/components/home/Hero";
 
 const Home = () => {
   return (
-    <View>
-      <Text>Home</Text>
-    </View>
+    <SafeAreaView className="flex-1 bg-white">
+      <Navbar />
+      <Hero />
+    </SafeAreaView>
   );
 };
 
