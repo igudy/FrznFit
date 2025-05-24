@@ -87,7 +87,7 @@ const NewIn = () => {
     <View className="mt-6">
       {/* Header */}
       <View className="flex-row justify-between items-center mb-4 px-4">
-        <Text className="text-lg font-clashBold text-purple-600">New In</Text>
+        <Text className="text-2xl font-clashBold text-purple-600">New In</Text>
         <Text className="text-sm font-semibold text-gray-500">See All</Text>
       </View>
 
@@ -101,6 +101,7 @@ const NewIn = () => {
           <View
             key={item.id}
             className="w-44 bg-white rounded-xl mr-4 shadow-sm overflow-hidden"
+            style={{ marginRight: 10 }}
           >
             <View className="relative">
               <Image
@@ -108,13 +109,13 @@ const NewIn = () => {
                 style={styles.productImage}
                 resizeMode="contain"
               />
-              <TouchableOpacity className="absolute top-2 left-2 bg-white p-2 rounded-full">
+              <TouchableOpacity className="absolute top-2 right-2 bg-white p-2 rounded-full">
                 <Ionicons name="heart-outline" size={24} color="#6B7280" />
               </TouchableOpacity>
             </View>
             <View className="p-3">
               <Text
-                className="text-sm font-clashMedium font-medium text-gray-800"
+                className="text-sm font-medium font-clashMedium text-gray-800"
                 numberOfLines={2}
               >
                 {item.title}

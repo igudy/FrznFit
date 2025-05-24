@@ -87,7 +87,7 @@ const TopSelling = () => {
     <View className="mt-6">
       {/* Header */}
       <View className="flex-row justify-between items-center mb-4 px-4">
-        <Text className="text-lg font-clashBold">Top Selling</Text>
+        <Text className=" font-clashBold text-2xl">Top Selling</Text>
         <Text className="text-sm font-semibold text-gray-500">See All</Text>
       </View>
 
@@ -101,6 +101,7 @@ const TopSelling = () => {
           <View
             key={item.id}
             className="w-44 bg-white rounded-xl mr-4 shadow-sm overflow-hidden"
+            style={{ marginRight: 10 }}
           >
             <View className="relative">
               <Image

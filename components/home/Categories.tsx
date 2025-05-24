@@ -25,37 +25,36 @@ const Categories = () => {
     <>
       {/* Categories */}
       <View className="flex-row justify-between items-center mt-6 mb-4 px-4">
-        <Text className="font-clashBold mb-3">Categories</Text>
+        <Text className="font-clashBold text-2xl mb-3">Categories</Text>
         <Text className="text-sm font-clashMedium text-gray-500 mr-2">
           See All
         </Text>
       </View>
 
-      <View style={{ marginLeft: 2 }}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 1 }}
-        >
-          {categories.map((item, index) => (
-            <View
-              key={index}
-              className="items-center"
-              style={{ marginRight: 20 }}
-            >
-              <View className="w-16 h-16 rounded-full bg-gray-200 overflow-hidden">
-                <Image
-                  source={item.image}
-                  className="w-full h-full object-cover"
-                />
-              </View>
-              <Text className="text-md mt-1 font-clashMedium">
-                {item.title}
-              </Text>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ marginRight: 6 }}
+      >
+        {categories.map((item, index) => (
+          <View className="items-center mr-5" style={{ marginHorizontal: 3 }}>
+            <View className="w-16 h-16 rounded-full bg-gray-200 overflow-hidden items-center justify-center">
+              <Image
+                source={item.image}
+                style={{ width: 64, height: 64 }}
+                resizeMode="cover"
+              />
             </View>
-          ))}
-        </ScrollView>
-      </View>
+            <Text
+              className="text-md mt-1 font-clashMedium text-center"
+              numberOfLines={1}
+              style={{ maxWidth: 70 }}
+            >
+              {item.title}
+            </Text>
+          </View>
+        ))}
+      </ScrollView>
     </>
   );
 };
