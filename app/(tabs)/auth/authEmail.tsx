@@ -8,8 +8,12 @@ import {
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AuthFormData, authSchema } from "@/components/schema/auth";
+import { AuthFormData, emailSchema } from "@/components/schema/auth";
 import { useRouter } from "expo-router";
+import {
+  useGetLoginStatusQuery,
+  useGetUsersQuery,
+} from "@/components/apis/authApi";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -19,12 +23,19 @@ export default function LoginScreen() {
     handleSubmit,
     formState: { errors },
   } = useForm<AuthFormData>({
-    resolver: zodResolver(authSchema),
+    resolver: zodResolver(emailSchema),
     defaultValues: {
       email: "",
     },
   });
 
+  const {
+    data: userData,
+    isLoading: isLoadingUserData,
+    error: isErrorUserData,
+  } = useGetUsersQuery({});
+
+  const { data: getStatus } = useGetLoginStatusQuery({});
   const handleGoogleLogin = () => {
     Alert.alert("Google Login", "Google login would be implemented here");
   };
@@ -35,6 +46,10 @@ export default function LoginScreen() {
         <Text className="font-clashMedium text-black text-3xl text-gray-800 mb-10">
           Sign In
         </Text>
+
+        {/* {userData?.map((item) => (
+          <Text>{item.name}</Text>
+        ))} */}
 
         <View className="mb-4">
           {/* <Text className="text-sm text-gray-600 mb-1">Email</Text> */}
@@ -70,7 +85,12 @@ export default function LoginScreen() {
         {/* Login Button */}
         <TouchableOpacity
           className="bg-purple-600 rounded-full p-4 items-center mb-4"
-          onPress={() => router.push("/auth/authPassword")}
+          onPress={handleSubmit((data) => {
+            router.push({
+              pathname: "/auth/authPassword",
+              params: { email: data.email },
+            });
+          })}
         >
           <Text className="text-white font-medium text-lg text-lg font-clashBold text-xl">
             Continue
@@ -112,7 +132,6 @@ export default function LoginScreen() {
 
 //  <View className="flex-1 items-center justify-center bg-white">
 //    <Text className="font-clashMedium text-3xl">Login Page</Text>
-
 //    {/* <Text className="font-clash text-xl">Hello Clash Regular</Text>
 //    <Text className="font-clashBold text-xl">Hello Clash Bold</Text>
 //    <Text className="font-clashLight text-xl">Hello Clash Light</Text>

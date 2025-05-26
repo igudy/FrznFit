@@ -14,10 +14,15 @@ import { useState } from "react";
 import { z } from "zod";
 import { RegisterFormData, registerSchema } from "@/components/schema/auth";
 import Toast from "react-native-toast-message";
+import { useRegisterUserMutation } from "@/components/apis/authApi";
+import { ActivityIndicator } from "react-native";
+// import { CommonActions, useNavigation } from "@react-navigation/native";
 
 const Register = () => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const [registerUser, { isLoading }] = useRegisterUserMutation();
+  // const navigation = useNavigation();
 
   const {
     control,
@@ -33,14 +38,34 @@ const Register = () => {
     },
   });
 
-  const onSubmit = (data: RegisterFormData) => {
-    console.log("Registration data:", data);
-    Toast.show({
-      type: "success",
-      text1: "Login Successful 👌",
-      text2: "Welcome back, Chief!",
-    });
-    router.replace("/auth/forgotPassword");
+  const onSubmit = async (data: RegisterFormData) => {
+    try {
+      const fullName = `${data.firstName} ${data.lastName}`;
+      const response = await registerUser({
+        name: fullName,
+        email: data.email,
+        password: data.password,
+      }).unwrap();
+
+      Toast.show({
+        type: "success",
+        text1: "Registration Successful 👌",
+        text2: `Welcome, ${data.firstName}!`,
+      });
+
+      // Redirect to login or dashboard
+      // router.replace("/home/home");
+      router.navigate({
+        pathname: "/home/home",
+        params: {},
+      });
+    } catch (err: any) {
+      Toast.show({
+        type: "error",
+        text1: "Registration Failed ❌",
+        text2: err?.data?.message || "Something went wrong.",
+      });
+    }
   };
 
   const handleGoogleSignUp = () => {
@@ -193,10 +218,19 @@ const Register = () => {
 
         {/* Sign Up Button */}
         <TouchableOpacity
-          className="bg-purple-600 rounded-full p-4 items-center mb-4"
+          className={`${
+            isLoading ? "bg-purple-400" : "bg-purple-600"
+          } rounded-full p-4 items-center mb-4`}
           onPress={handleSubmit(onSubmit)}
+          disabled={isLoading}
         >
-          <Text className="text-white font-medium">Create Account</Text>
+          <Text className="text-white font-medium">
+            {isLoading ? (
+              <ActivityIndicator size="small" color="#ffffff" />
+            ) : (
+              "Create Account"
+            )}
+          </Text>
         </TouchableOpacity>
 
         {/* Divider */}

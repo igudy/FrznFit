@@ -1,14 +1,18 @@
 import { z } from "zod";
 
 // Validation schema
-export const authSchema = z.object({
+export const emailSchema = z.object({
   email: z.string().email("Invalid email").nonempty("Email is required"),
+});
+export type AuthFormData = z.infer<typeof emailSchema>;
+
+export const passwordSchema = z.object({
   password: z
     .string()
     .min(6, "Password must be at least 6 characters")
     .nonempty("Password is required"),
 });
-export type AuthFormData = z.infer<typeof authSchema>;
+export type PasswordFormData = z.infer<typeof passwordSchema>;
 
 export const forgotPassSchema = z.object({
   forgotPassword: z
@@ -17,7 +21,6 @@ export const forgotPassSchema = z.object({
     .nonempty("Password is required"),
 });
 export type ForgotPasswordForm = z.infer<typeof forgotPassSchema>;
-
 
 export const registerSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),

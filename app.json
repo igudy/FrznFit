@@ -17,6 +17,9 @@
         "backgroundColor": "#ffffff"
       }
     },
+    "extra": {
+      "backendUrl": "https://shopiverse-server.onrender.com"
+    },
     "web": {
       "bundler": "metro",
       "output": "static",

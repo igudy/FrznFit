@@ -37,7 +37,11 @@ const Categories = () => {
         contentContainerStyle={{ marginRight: 6 }}
       >
         {categories.map((item, index) => (
-          <View className="items-center mr-5" style={{ marginHorizontal: 3 }}>
+          <View
+            key={index}
+            className="items-center mr-5"
+            style={{ marginHorizontal: 3 }}
+          >
             <View className="w-16 h-16 rounded-full bg-gray-200 overflow-hidden items-center justify-center">
               <Image
                 source={item.image}
