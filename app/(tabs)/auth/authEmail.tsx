@@ -14,9 +14,40 @@ import {
   useGetLoginStatusQuery,
   useGetUsersQuery,
 } from "@/components/apis/authApi";
+import * as WebBrowser from "expo-web-browser";
+import { useEffect } from "react";
+import { useGoogleLoginMutation } from "@/components/apis/authApi";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Google from "expo-auth-session/providers/google";
+import Constants from "expo-constants";
+import { makeRedirectUri } from "expo-auth-session";
+
+WebBrowser.maybeCompleteAuthSession();
+
+interface MyExtra {
+  googleExpoClientId: string;
+  googleIosClientId: string;
+  googleAndroidClientId: string;
+  googleWebClientId: string;
+  backendUrl: string;
+}
+
+const extra = Constants.expoConfig?.extra as MyExtra;
 
 export default function LoginScreen() {
   const router = useRouter();
+  const [googleLogin] = useGoogleLoginMutation();
+
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    clientId: extra.googleExpoClientId,
+    iosClientId: extra.googleIosClientId,
+    androidClientId: extra.googleAndroidClientId,
+    webClientId: extra.googleWebClientId,
+  });
+
+  console.log("🚀 ~ LoginScreen ~ promptAsync:", promptAsync);
+  console.log("🚀 ~ LoginScreen ~ response:", response);
+  console.log("🚀 ~ LoginScreen ~ request:", request);
 
   const {
     control,
@@ -29,30 +60,59 @@ export default function LoginScreen() {
     },
   });
 
-  const {
-    data: userData,
-    isLoading: isLoadingUserData,
-    error: isErrorUserData,
-  } = useGetUsersQuery({});
+  // const {
+  //   data: userData,
+  //   isLoading: isLoadingUserData,
+  //   error: isErrorUserData,
+  // } = useGetUsersQuery({});
 
-  const { data: getStatus } = useGetLoginStatusQuery({});
-  const handleGoogleLogin = () => {
-    Alert.alert("Google Login", "Google login would be implemented here");
+  // const { data: getStatus } = useGetLoginStatusQuery({});
+
+  useEffect(() => {
+    if (response?.type === "success") {
+      const { authentication } = response;
+      handleGoogleSignIn(authentication?.accessToken || "");
+    }
+  }, [response]);
+
+  const handleGoogleSignIn = async (accessToken: string) => {
+    try {
+      const response = await fetch(
+        "https://www.googleapis.com/oauth2/v3/userinfo",
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      const userInfo = await response.json();
+
+      // Call your backend with the Google token
+      const res = await googleLogin({
+        userToken: accessToken,
+        isMobile: true,
+      }).unwrap();
+
+      // Store the token for future requests
+      await AsyncStorage.setItem("userToken", res.token);
+
+      // Navigate to home screen
+      router.replace("/home/home");
+    } catch (error) {
+      Alert.alert("Error", "Failed to sign in with Google");
+      console.error(error);
+    }
   };
 
   return (
-    <View className="flex-1  items-center justify-center  bg-white p-6">
+    <View className="flex-1 items-center justify-center bg-white p-6">
       <View className="w-full max-w-md">
         <Text className="font-clashMedium text-black text-3xl text-gray-800 mb-10">
           Sign In
         </Text>
 
-        {/* {userData?.map((item) => (
-          <Text>{item.name}</Text>
-        ))} */}
-
         <View className="mb-4">
-          {/* <Text className="text-sm text-gray-600 mb-1">Email</Text> */}
           <View
             className={`border ${
               errors.email ? "border-red-500" : "border-gray-300"
@@ -82,7 +142,6 @@ export default function LoginScreen() {
           )}
         </View>
 
-        {/* Login Button */}
         <TouchableOpacity
           className="bg-purple-600 rounded-full p-4 items-center mb-4"
           onPress={handleSubmit((data) => {
@@ -97,17 +156,16 @@ export default function LoginScreen() {
           </Text>
         </TouchableOpacity>
 
-        {/* Divider */}
         <View className="flex-row items-center my-6">
           <View className="flex-1 h-px bg-gray-300" />
           <Text className="mx-4 text-gray-500">or</Text>
           <View className="flex-1 h-px bg-gray-300" />
         </View>
 
-        {/* Google Sign In */}
         <TouchableOpacity
           className="border border-gray-300 rounded-lg p-3 flex-row items-center justify-center"
-          onPress={handleGoogleLogin}
+          onPress={() => promptAsync()}
+          disabled={!request}
         >
           <Image
             source={{
@@ -118,7 +176,6 @@ export default function LoginScreen() {
           <Text className="text-gray-700">Continue with Google</Text>
         </TouchableOpacity>
 
-        {/* Sign Up Link */}
         <View className="flex-row justify-center mt-6">
           <Text className="text-gray-600">Don't have an account? </Text>
           <TouchableOpacity onPress={() => router.push("/auth/register")}>

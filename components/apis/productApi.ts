@@ -42,7 +42,7 @@ export const productApi = createApi({
       }),
       providesTags: ["productApi"],
     }),
-    getProductById: builder.query<IProduct, string>({
+    getProductById: builder.query<IProduct, { id: string | string[] }>({
       query: (id) => ({
         url: `/products/${id}`,
         method: "GET",
@@ -52,7 +52,4 @@ export const productApi = createApi({
   }),
 });
 
-export const {
-  useGetProductsQuery,
-  useGetProductByIdQuery,
-} = productApi;
+export const { useGetProductsQuery, useGetProductByIdQuery } = productApi;

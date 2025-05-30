@@ -88,6 +88,13 @@ export const authApi = createApi({
       }),
       invalidatesTags: ["authApi"],
     }),
+    googleLogin: builder.mutation({
+      query: (credentials) => ({
+        url: "/google/callback",
+        method: "POST",
+        body: credentials,
+      }),
+    }),
   }),
 });
 
@@ -97,6 +104,7 @@ export const {
   useLoginUserMutation,
   useRegisterUserMutation,
   useGetSingleUserQuery,
+  useGoogleLoginMutation,
 } = authApi;
 
 // "backendUrl": "http://localhost:3000"
