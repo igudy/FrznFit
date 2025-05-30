@@ -19,7 +19,7 @@ import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface IUserInput {
-  email: string;
+  // email: string;
   password: string;
 }
 

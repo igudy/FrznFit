@@ -1,12 +1,14 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
 const optionRanges = ["Men", "Women", "Boys", "Girls"];
 
 const Navbar = () => {
   const [selectedOptions, setSelectedOptions] = useState<string | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  const router = useRouter();
 
   return (
     <View className="relative z-10">
@@ -72,7 +74,10 @@ const Navbar = () => {
         </View>
 
         {/* Cart Button */}
-        <TouchableOpacity className="bg-purple-600 p-2 rounded-full relative">
+        <TouchableOpacity
+          className="bg-purple-600 p-2 rounded-full relative"
+          onPress={() => router.push("/cart/cart")}
+        >
           <Ionicons name="cart-outline" size={15} color="#F3F4F6" />
         </TouchableOpacity>
       </View>
