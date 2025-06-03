@@ -16,7 +16,7 @@ import { useState } from "react";
 const ProductDetails = () => {
   const router = useRouter();
   const { id } = useLocalSearchParams();
-  const { data: product, isLoading, error } = useGetProductByIdQuery({ id });
+  const { data: product, isLoading, error } = useGetProductByIdQuery(id);
   const [quantity, setQuantity] = useState(1);
 
   return (

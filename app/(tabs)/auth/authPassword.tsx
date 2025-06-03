@@ -11,22 +11,85 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { passwordSchema } from "@/components/schema/auth";
 import { useLocalSearchParams } from "expo-router";
-import { useLoginUserMutation } from "@/components/apis/authApi";
+import {
+  useGoogleLoginMutation,
+  useLoginUserMutation,
+} from "@/components/apis/authApi";
 import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as WebBrowser from "expo-web-browser";
+import Constants from "expo-constants";
+import * as Google from "expo-auth-session/providers/google";
+
+WebBrowser.maybeCompleteAuthSession();
 
 interface IUserInput {
   // email: string;
   password: string;
 }
 
+interface MyExtra {
+  googleExpoClientId: string;
+  googleIosClientId: string;
+  googleAndroidClientId: string;
+  googleWebClientId: string;
+  backendUrl: string;
+}
+
+const extra = Constants.expoConfig?.extra as MyExtra;
+
 const authPassword = () => {
   const { email } = useLocalSearchParams();
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+
+  const [googleLogin] = useGoogleLoginMutation();
+  const [backendID, setBackendID] = useState("");
+
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    clientId: extra.googleExpoClientId,
+    iosClientId: extra.googleIosClientId,
+    androidClientId: extra.googleAndroidClientId,
+    webClientId: extra.googleWebClientId,
+    scopes: ["openid", "profile", "email"],
+    responseType: "id_token",
+  });
+
+  console.log("🚀 ~ LoginScreen ~ promptAsync:", promptAsync);
+  console.log("🚀 ~ LoginScreen ~ response:", response);
+  console.log("🚀 ~ LoginScreen ~ request:", request);
+
+  useEffect(() => {
+    if (response?.type === "success") {
+      const idToken = response?.params?.id_token;
+      if (idToken) {
+        handleGoogleSignIn(idToken);
+      } else {
+        Alert.alert("Error", "No ID token returned");
+      }
+    }
+  }, [response]);
+
+  const handleGoogleSignIn = async (idToken: string) => {
+    try {
+      const res = await googleLogin({
+        userToken: idToken,
+        isMobile: true,
+      }).unwrap();
+
+      // Store the token for future requests
+      await AsyncStorage.setItem("userToken", res.token);
+
+      // Navigate to home screen
+      router.replace("/home/home");
+    } catch (error) {
+      Alert.alert("Error", "Failed to sign in with Google");
+      console.error(error);
+    }
+  };
 
   const {
     control,
@@ -147,7 +210,8 @@ const authPassword = () => {
         {/* Google Sign In */}
         <TouchableOpacity
           className="border border-gray-300 rounded-lg p-3 flex-row items-center justify-center"
-          onPress={handleGoogleLogin}
+          onPress={() => promptAsync()}
+          disabled={!request}
         >
           <Image
             source={{
