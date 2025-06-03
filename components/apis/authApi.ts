@@ -90,7 +90,7 @@ export const authApi = createApi({
     }),
     googleLogin: builder.mutation({
       query: (credentials) => ({
-        url: "/google/callback",
+        url: "users/google/callback",
         method: "POST",
         body: credentials,
       }),
