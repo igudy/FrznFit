@@ -34,6 +34,7 @@ export const productApi = createApi({
 
     return rawBaseQuery(args, api, extraOptions);
   },
+  
   endpoints: (builder) => ({
     getProducts: builder.query<IProduct[], any>({
       query: () => ({

@@ -15,7 +15,7 @@ import {
   useGetUsersQuery,
 } from "@/components/apis/authApi";
 import * as WebBrowser from "expo-web-browser";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useGoogleLoginMutation } from "@/components/apis/authApi";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Google from "expo-auth-session/providers/google";
@@ -37,12 +37,15 @@ const extra = Constants.expoConfig?.extra as MyExtra;
 export default function LoginScreen() {
   const router = useRouter();
   const [googleLogin] = useGoogleLoginMutation();
+  const [backendID, setBackendID] = useState("");
 
   const [request, response, promptAsync] = Google.useAuthRequest({
     clientId: extra.googleExpoClientId,
     iosClientId: extra.googleIosClientId,
     androidClientId: extra.googleAndroidClientId,
     webClientId: extra.googleWebClientId,
+    scopes: ["openid", "profile", "email"],
+    responseType: "id_token",
   });
 
   console.log("🚀 ~ LoginScreen ~ promptAsync:", promptAsync);
@@ -60,37 +63,21 @@ export default function LoginScreen() {
     },
   });
 
-  // const {
-  //   data: userData,
-  //   isLoading: isLoadingUserData,
-  //   error: isErrorUserData,
-  // } = useGetUsersQuery({});
-
-  // const { data: getStatus } = useGetLoginStatusQuery({});
-
   useEffect(() => {
     if (response?.type === "success") {
-      const { authentication } = response;
-      handleGoogleSignIn(authentication?.accessToken || "");
+      const idToken = response?.params?.id_token;
+      if (idToken) {
+        handleGoogleSignIn(idToken);
+      } else {
+        Alert.alert("Error", "No ID token returned");
+      }
     }
   }, [response]);
 
-  const handleGoogleSignIn = async (accessToken: string) => {
+  const handleGoogleSignIn = async (idToken: string) => {
     try {
-      const response = await fetch(
-        "https://www.googleapis.com/oauth2/v3/userinfo",
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-
-      const userInfo = await response.json();
-
-      // Call your backend with the Google token
       const res = await googleLogin({
-        userToken: accessToken,
+        userToken: idToken,
         isMobile: true,
       }).unwrap();
 
